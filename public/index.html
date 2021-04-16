@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- <script src="https://unpkg.com/@solana/web3.js@0.92.0/lib/index.iife.js"></script> -->
+    <script
+     src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.3.5/web3.min.js"
+     integrity="sha512-S/O+gH5szs/+/dUylm15Jp/JZJsIoWlpSVMwT6yAS4Rh7kazaRUxSzFBwnqE2/jBphcr7xovTQJaopiEZAzi+A=="
+     crossorigin="anonymous"></script>
+    <title>HASHSYNTH - β</title>
+</head>
+<body>
+
+    <script defer src="https://widgets.coingecko.com/coingecko-coin-ticker-widget.js"></script>
+    <coingecko-coin-ticker-widget
+        coin-id="wbnb"
+        currency="jpy"
+        locale="ja"
+        background-color="#fbf9f9">
+    </coingecko-coin-ticker-widget>
+
+    <div id="showPlace" style="overflow-wrap: break-word;"></div>
+    
+    <input type="text" id="inputWalletAddress">
+    <p>exampl: <i>0xD070A63fe0A9c0D317E345B2A8f67edEe9d9C2A8</i></p>
+    <button id="submit">check ( ← input BSCaddress )</button>
+
+    <script>
+        "use strict"
+
+        const d = document;
+        
+        const web3 = new Web3( 'https://bsc-dataseed1.binance.org:443' );
+             
+        const showPlace = d.getElementById("showPlace");
+        const inputWalletAddress = d.getElementById("inputWalletAddress");
+        const btnSubmit = d.getElementById("submit");
+        btnSubmit.addEventListener("click",(e)=>{
+            if( web3.utils.isAddress(inputWalletAddress.value) ){
+                
+                // ウォレットに入っているeth数が分かる
+                // web3.eth.getBalance(inputWalletAddress.value)
+                //     .then((balance)=>{
+                //         console.log(inputWalletAddress.value);
+                //         console.log(balance);
+                //         const isHowEther = web3.utils.fromWei(balance,"ether");
+                //         showPlace.textContent = `${isHowEther} ether`;
+                //     });
+
+                // web3.eth.getPastLogs({
+                //     address: inputWalletAddress.value,
+                //     toBlock: "latest"
+                // }).then(console.log);
+
+
+                ( async ()=>{
+                    const jsonArr = await getTransactionHistory(inputWalletAddress.value);
+
+                    console.log(jsonArr);
+                
+                    jsonArr.result.forEach( json => {
+
+                        const date      = new Date( json.timeStamp * 1000 );
+                        const toAddress = json.to;
+                        const hash      = json.hash;
+                        const currentBlockTo = web3.eth.blockNumber;
+                        
+                        // if(toAddress === inputWalletAddress){ // もし 入力アドレスへの送金?の場合であれば 表示してあげる?
+                            showPlace.insertAdjacentHTML("beforeend",`
+                                <div class="${currentBlockTo}">
+                                    <p>${date.toLocaleString()}</p>
+                                    <p>toAddress: ${toAddress} </p>
+                                    <p>hash: ${hash} </p>
+                                    ${JSON.stringify(json)}
+                                </div>
+                            `);
+                        // }
+
+                    });
+
+                })();
+
+            } else {
+                showPlace.textContent = `invalid BNB address`;
+            }
+        });
+            
+        async function getTransactionHistory(address) {
+            // const currentBlock = web3.eth.blockNumber;
+
+            const url = `${location.origin}/api/transaction/${address}`;
+
+            return fetch(url).then( res => {
+                return res.json();
+            });
+        }        
+
+
+        
+    </script>
+
+    <style>
+        body {
+            text-align: center;
+        }
+    </style>
+    
+</body>
+</html>
