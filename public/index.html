@@ -9,6 +9,11 @@
      src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.3.5/web3.min.js"
      integrity="sha512-S/O+gH5szs/+/dUylm15Jp/JZJsIoWlpSVMwT6yAS4Rh7kazaRUxSzFBwnqE2/jBphcr7xovTQJaopiEZAzi+A=="
      crossorigin="anonymous"></script>
+    <link
+        href="https://cdn.jsdelivr.net/gh/krishdevdb/reseter.css/css/reseter.min.css"
+        rel="preload"
+        as="style"
+        onload="this.onload=null;this.rel='stylesheet'">
     <title>HASHSYNTH - β</title>
 </head>
 <body>
@@ -21,11 +26,20 @@
         background-color="#fbf9f9">
     </coingecko-coin-ticker-widget>
 
+    <!-- typatone test -->
+    <iframe
+        src="//typatone.com"
+        width="320"
+        height="540"
+        frameborder="0"
+        border="0"
+        style="border: 6px solid #ccc; border-radius: 3px;"></iframe>
+
     <div id="showPlace" style="overflow-wrap: break-word;"></div>
     
     <input type="text" id="inputWalletAddress">
     <p>exampl: <i>0xD070A63fe0A9c0D317E345B2A8f67edEe9d9C2A8</i></p>
-    <button id="submit">check ( ← input BSCaddress )</button>
+    <button id="submit">check ( ↑ input BSCaddress )</button>
 
     <script>
         "use strict"
@@ -60,25 +74,46 @@
 
                     console.log(jsonArr);
                 
+                    const fullHashFromAllTransaction = [];
+
                     jsonArr.result.forEach( json => {
 
-                        const date      = new Date( json.timeStamp * 1000 );
-                        const toAddress = json.to;
-                        const hash      = json.hash;
+                        const date        = new Date( json.timeStamp * 1000 );
+                        const fromAddress = json.from;
+                        const toAddress   = json.to;
+                        const hash        = json.hash;
+                        const blockHash   = json.blockHash;
+
+                        const fullHash    = fromAddress+toAddress+hash+blockHash;
+                        fullHashFromAllTransaction.push(fullHash);
+
                         const currentBlockTo = web3.eth.blockNumber;
                         
                         // if(toAddress === inputWalletAddress){ // もし 入力アドレスへの送金?の場合であれば 表示してあげる?
                             showPlace.insertAdjacentHTML("beforeend",`
                                 <div class="${currentBlockTo}">
-                                    <p>${date.toLocaleString()}</p>
-                                    <p>toAddress: ${toAddress} </p>
-                                    <p>hash: ${hash} </p>
-                                    ${JSON.stringify(json)}
+                                    
+                                    <p>
+                                        
+                                    </p>
+
+                                    <p>
+                                        FULLHASH: "${fullHash}"
+                                    </p>
+                                    
+                                    <span>${date.toLocaleString()}</span><br>
+                                    <small>fromAddress: ${fromAddress} </small><br>
+                                    <small>toAddress: ${toAddress} </small><br>
+                                    <small>hash: ${hash} </small><br>
+                                    <small>blockHash: ${blockHash} </small>
                                 </div>
                             `);
+                            // ${ JSON.stringify(json) }
                         // }
 
                     });
+                    
+                    showPlace.insertAdjacentHTML("afterbegin",`<div style="background-color: #999;">${fullHashFromAllTransaction.join("")}</div>`);
 
                 })();
 
