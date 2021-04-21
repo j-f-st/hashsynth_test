@@ -1,25 +1,36 @@
 async function handleRequest(request) {
 
-    const { pathname } = new URL(request.url);
-    if( pathname ){
-        console.log(pathname);    
-    }
+    const bscScanApiKey = Deno.env.get("BSC_SCAN_API_KEY");
 
-    const response = await fetch("https://api.github.com/users/denoland", {
+    const { pathname } = new URL(request.url);
+    if( pathname ){ console.log(pathname); }
+    // 仮
+    const walletAddress = pathname.replace("/","").replace("?","");
+
+    const response = await fetch("https://api.bscscan.com/api", {
         headers: {
             // Servers use this header to decide on response body format.
             // "application/json" implies that we accept the data in JSON format.
             accept: "application/json",
         },
+        body: {
+            'module':'account',
+            'action':'txlist', // transaction list ?
+            'address':walletAddress,
+            'startblock':0,
+            // 'endblock':currentBlock,
+            'page':1,
+            'offset':30, // 取得するトランザクションの最大数
+            'sort':'desc',
+            'apikey': bscScanApiKey
+        }
     });
 
     // The .ok property of response indicates that the request is
     // successful (status is in range of 200-299).
     if (response.ok) {
-        // response.json() method reads the body and parses it as JSON.
-        // It then returns the data in JavaScript object.
-        const { name, login, avatar_url: avatarUrl } = await response.json();
-        return new Response(JSON.stringify({ name, username: login, avatarUrl }), {
+        
+        return new Response(JSON.stringify( await response.json() ), {
             headers: {
                 "content-type": "application/json; charset=UTF-8",
             },
