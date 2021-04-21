@@ -3,30 +3,26 @@ async function handleRequest(request) {
     const bscScanApiKey = Deno.env.get("BSC_SCAN_API_KEY");
 
     const { pathname } = new URL(request.url);
-    const walletAddress = pathname.replace("/","").replace("?","");
-    if( pathname ){ 
-        console.log(pathname);
-        console.log(walletAddress);
-    }
-    // 仮
+    const walletAddress = pathname.replace("/","");
 
-    const response = await fetch("https://api.bscscan.com/api", {
+
+    // 仮
+    const reqBody: any = {
+        'module':'account',
+        'action':'txlist', // transaction list ?
+        'address':walletAddress,
+        'startblock':0,
+        // 'endblock':currentBlock,
+        'page':1,
+        'offset':30, // 取得するトランザクションの最大数
+        'sort':'desc',
+        'apikey': bscScanApiKey
+    }
+    const qs  = new URLSearchParams(reqBody);
+    const response = await fetch(`https://api.bscscan.com/api?${qs}`, {
         headers: {
-            // Servers use this header to decide on response body format.
-            // "application/json" implies that we accept the data in JSON format.
             accept: "application/json",
         },
-        body: {
-            'module':'account',
-            'action':'txlist', // transaction list ?
-            'address':walletAddress,
-            'startblock':0,
-            // 'endblock':currentBlock,
-            'page':1,
-            'offset':30, // 取得するトランザクションの最大数
-            'sort':'desc',
-            'apikey': bscScanApiKey
-        }
     });
 
     // The .ok property of response indicates that the request is
