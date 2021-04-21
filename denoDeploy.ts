@@ -3,12 +3,12 @@ async function handleRequest(request) {
     const bscScanApiKey = Deno.env.get("BSC_SCAN_API_KEY");
 
     const { pathname } = new URL(request.url);
+    const walletAddress = pathname.replace("/","").replace("?","");
     if( pathname ){ 
         console.log(pathname);
-        console.log(bscScanApiKey);
+        console.log(walletAddress);
     }
     // 仮
-    const walletAddress = pathname.replace("/","").replace("?","");
 
     const response = await fetch("https://api.bscscan.com/api", {
         headers: {
