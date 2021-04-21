@@ -3,7 +3,10 @@ async function handleRequest(request) {
     const bscScanApiKey = Deno.env.get("BSC_SCAN_API_KEY");
 
     const { pathname } = new URL(request.url);
-    if( pathname ){ console.log(pathname); }
+    if( pathname ){ 
+        console.log(pathname);
+        console.log(bscScanApiKey);
+    }
     // 仮
     const walletAddress = pathname.replace("/","").replace("?","");
 
