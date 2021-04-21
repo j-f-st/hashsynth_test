@@ -2,7 +2,7 @@ async function handleRequest(request) {
 
     const { pathname } = new URL(request.url);
     if( pathname ){
-        
+        console.log(pathname);    
     }
 
     const response = await fetch("https://api.github.com/users/denoland", {
