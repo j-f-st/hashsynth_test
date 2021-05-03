@@ -21,8 +21,12 @@ router.get("/", async (ctx)=>{
 // API
 // ---
 router.get("/api/transaction/:walletaddress", async ( ctx ) =>{
+// router.get("/api/:chain/transaction/:walletaddress", async ( ctx ) =>{
 
+    // const { chain,walletaddress } = helpers.getQuery(ctx, { mergeParams : true });
     const { walletaddress } = helpers.getQuery(ctx, { mergeParams : true });
+
+    // console.log(chain); // chain で eth bsc ( sol ) 振り分け予定
 
     const BSC_SCAN_API_KEY = config().BSC_SCAN_API_KEY;
 
