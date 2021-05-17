@@ -3,25 +3,25 @@ async function handleRequest(request) {
     const bscScanApiKey = Deno.env.get("BSC_SCAN_API_KEY");
     const ethScanApiKey = Deno.env.get("ETH_SCAN_API_KEY");
 
-    const { pathname } = new URL(request.url);
-    console.log(pathname);
-    // pathname.split("/");
-    const walletAddress = pathname.replace("/","");
+    const { pathname }  = new URL(request.url);
+    const chain         = pathname.split("/")[1];
+    const walletAddress = pathname.split("/")[2];
+    
 
     // 仮
     const reqBody: any = {
         'module':'account',
         'action':'txlist', // transaction list ?
-        'address':walletAddress,
+        'address': walletAddress,
         'startblock':0,
         // 'endblock':currentBlock,
         'page':1,
         'offset':30, // 取得するトランザクションの最大数
         'sort':'desc',
-        'apikey': bscScanApiKey
+        'apikey': chain === "eth" ? ethScanApiKey : bscScanApiKey
     }
     const qs  = new URLSearchParams(reqBody);
-    const response = await fetch(`https://api.bscscan.com/api?${qs}`, {
+    const response = await fetch( chain === "eth" ? `https://api.etherscan.io/api?${qs}` : `https://api.bscscan.com/api?${qs}`, {
         headers: {
             accept: "application/json",
         },
