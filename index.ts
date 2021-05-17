@@ -20,17 +20,16 @@ router.get("/", async (ctx)=>{
 // ---
 // API
 // ---
-router.get("/api/transaction/:walletaddress", async ( ctx ) =>{
-// router.get("/api/:chain/transaction/:walletaddress", async ( ctx ) =>{
+router.get("/api/:chain/transaction/:walletaddress", async ( ctx ) =>{
 
-    // const { chain,walletaddress } = helpers.getQuery(ctx, { mergeParams : true });
-    const { walletaddress } = helpers.getQuery(ctx, { mergeParams : true });
+    const { chain, walletaddress } = helpers.getQuery(ctx, { mergeParams : true });
 
-    // console.log(chain); // chain で eth bsc ( sol ) 振り分け予定
+    // console.log(chain); | chain : eth / bsc
 
     const BSC_SCAN_API_KEY = config().BSC_SCAN_API_KEY;
+    const ETH_SCAN_API_KEY = config().ETH_SCAN_API_KEY;
 
-    async function getTransactionHistory( walletAddress: string ){
+    async function getTransactionHistory( chain: string, walletAddress: string ){
 
         const reqBody: any = {
             'module':'account',
@@ -41,19 +40,19 @@ router.get("/api/transaction/:walletaddress", async ( ctx ) =>{
             'page':1,
             'offset':30, //取得するトランザクションの最大数
             'sort':'desc',
-            'apikey':`${BSC_SCAN_API_KEY}`
+            'apikey': chain === "eth" ? `${ETH_SCAN_API_KEY}` : `${BSC_SCAN_API_KEY}`,
         };
 
         const qs  = new URLSearchParams(reqBody);
 
-        const externalApiUrl = "https://api.bscscan.com/api";
+        const externalApiUrl = chain === "eth" ? "https://api.etherscan.io/api" : "https://api.bscscan.com/api";
+        
         // @ts-ignore
         const res = await ky.post( `${externalApiUrl}?${qs}` ).json();
         return res;
     }
 
-    ctx.response.body = await getTransactionHistory(walletaddress);
-    // ctx.response.body = `入力したwalletaddressは: ${walletaddress} ${currentblock} ${BSC_SCAN_API_KEY}`;
+    ctx.response.body = await getTransactionHistory( chain, walletaddress );
 });
 router.get("/favicon.ico", async ( ctx ) =>{
     ctx.response.status = Status.OK;
