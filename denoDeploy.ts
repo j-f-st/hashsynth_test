@@ -16,7 +16,7 @@ async function handleRequest(request) {
         'startblock':0,
         // 'endblock':currentBlock,
         'page':1,
-        'offset':30, // 取得するトランザクションの最大数
+        'offset':20, // 取得するトランザクションの最大数
         'sort':'desc',
         'apikey': chain === "eth" ? ethScanApiKey : bscScanApiKey
     }
